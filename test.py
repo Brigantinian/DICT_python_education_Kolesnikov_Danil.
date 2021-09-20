@@ -1,1 +1,1 @@
-print("Python education")
+Print("Python education")
