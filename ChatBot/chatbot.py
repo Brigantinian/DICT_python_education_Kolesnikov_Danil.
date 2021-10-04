@@ -27,3 +27,4 @@ while x != 2:
      else :
        print("Please, try again.")
 print("Congratulations, have a nice day!")
+
