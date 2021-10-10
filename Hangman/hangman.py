@@ -21,5 +21,11 @@ def guess("guess_word, a "):
             print("No such letter in the word")
             k -= 1
             input_letter = input("Input a letter: ")
+print("H A N G  M  A N")
+a = []
+word_list = ["phython","java","kotlin","javascript"]
+guess_word = random.choice(word_list)
+print("guess_word")
+replace("guess_word")
 
 
