@@ -13,3 +13,8 @@ print("For " + caps + " cups of coffee you will need: ")
 print(str(water) + " ml of water")
 print(str(milk) + " ml of milk")
 print(str(beans) + " g of beans")
+water_in_machine = int(input("Write how many ml of water the coffee machine has:"))
+milk_in_machine = int(input("Write how many ml of milk the coffee machine has:"))
+beans_in_machine = int(input("Write how many ml of beans the coffee machine has:"))
+
+
