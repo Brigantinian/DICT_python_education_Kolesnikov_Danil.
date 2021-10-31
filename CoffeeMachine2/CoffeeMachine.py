@@ -61,6 +61,7 @@ def ingredients_in_Machine():
 ingredients_in_Machine()
 
 
+
 def espresso():
     global money_in_Machine, water_in_Machine, milk_in_Machine, beans_in_Machine, cups_in_Machine
     money_in_Machine += 4
@@ -129,3 +130,25 @@ def cappuccino():
 
 
             break
+
+
+if water_in_Machine < 0 :
+        print("Sorry, not enough water")
+        money_in_Machine -= 4
+        water_in_Machine += 250
+        beans_in_Machine += 16
+        cups_in_Machine += 1
+    elif beans_in_Machine < 0 :
+        print("Sorry, not enough coffee beans")
+        money_in_Machine -= 4
+        water_in_Machine += 250
+        beans_in_Machine += 16
+        cups_in_Machine += 1
+    elif cups_in_Machine < 0 :
+        print("Sorry, not enough cups")
+        money_in_Machine -= 4
+        water_in_Machine += 250
+        beans_in_Machine += 16
+        cups_in_Machine += 1
+
+
