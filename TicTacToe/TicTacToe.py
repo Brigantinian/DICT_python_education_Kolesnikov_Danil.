@@ -1,97 +1,112 @@
-from random import randint
-
-
-vert_coord = ("a", "b","c")
-
-
-def get_igrok_char():
-    igrok_char = input("Select char (x,0): ").strip(" ").lower()
-    while igrok_char not in ("x","0"):
-        print("Oshibka")
-        igrok_char = input("Select char (x,0): ").strip(" ").lower()
-    return igrok_char
-
-
-pole = [["_" for x in range(3)] for y in range(3)]
-
-def show_pole(pole):
-    print("_","1","2","3")
-    for y, v in enumerate(vert_coord):
-        print(v, pole[y])
-
-
-def igrok_position(pole):
-    real_x,real_y = 0,0
-    while True:
-        coord = input("Input coord: ").lower().strip("_")
-        y , x  = tuple(coord)
-
-
-        if  int(x) not in (1,2,3) or y not in vert_coord:
-          print("Not valid")
-        continue
-        real_x , real_y = int(x) - 1 , vert_coord.index(y)
-        if pole[y][x] == "_":
-            break
-        else:
-            print("Position not empty")
-        return real_x,real_y
+import random
 
 
 
-igrok_char = get_igrok_char()
-pc_char = (igrok_char)
+class TicTacToe:
 
 
-def get_opponent_char(char):
-    return "0" if char == "x" else "x"
-def is_win(igrok_char, pole):
-    opponent_char = get_opponent_char(igrok_char)
-    for y in range(3):
-        if opponent_char not in pole[y] and "_" not in pole[y]:
-            return True
-    for x in range (3):
-        kolonka = [pole[0][x],pole[1][x],pole[2][x]]
-        if opponent_char not in kolonka and "_" not in kolonka:
-            return True
-    diagonal = [pole[0][0],pole[1][1],pole[2][2]]
-    if  opponent_char not in diagonal and "_" not in diagonal:
-        diagonal = [pole[0][2], pole[1][1], pole[2][0]]
-        if opponent_char not in diagonal and "_" not in diagonal:
-            return True
+    def __init__(self):
+        self.pole = []
+
+    def create_pole(self):
+        for i in range(3):
+            row = []
+            for j in range(3):
+                row.append('-')
+            self.pole.append(row)
+
+    def get_random_first_igrok(self):
+        return random.randint(0, 1)
+
+    def fix_spot(self, row, col, igrok):
+        self.pole[row][col] = igrok
+
+    def is_igrok_win(self, igrok):
+        win = None
+        n = len(self.pole)
+        for y in range(n):
+            win = True
+            for x in range(n):
+                if self.pole[y][x] != igrok:
+                    win = False
+                    break
+            if win:
+                return win
+
+
+        for y in range(n):
+            win = True
+            for x in range(n):
+                if self.pole[x][y] != igrok:
+                    win = False
+                    break
+            if win:
+                return win
+            if len(self.pole) == 2:
+                break
+
+
+        win = True
+        for y in range(n):
+            if self.pole[y][y] != igrok:
+                win = False
+                break
+        if win:
+            return win
+
+        win = True
+        for y in range(n):
+            if self.pole[y][n - 1 - y] != igrok:
+                win = False
+                break
+        if win:
+            return win
         return False
 
-
-def is_draw(pole):
-    print("Draw")
-    count = 0
-    for y in range(3):
-        count += 1 if "_" in pole[y] else 0
-    return count == 0
-
-
-def get_pc_position(pole):
-    x,y = randint(0,2), randint(0,2)
-    while pole[y][x] !="_":
-        x,y = randint(0,2),randint(0,2)
-    return x,y
-
-while True:
-    show_pole(pole)
-    if is_draw(pole):
-        print("is draw")
-        break
+    def is_pole_filled(self):
+     for row in self.pole:
+        for item in row:
+          if item == '-':
+            return False
+        return True
 
 
-        x,y = igrok_position(pole)
-        pole[y][x] = igrok_position
-        if is_win(igrok_position,pole):
-            print("you win")
-            break
-        x, y = pc_position(pole)
-        pole[y][x] = pc_position
-        if is_win(pc_position, pole):
-            print("you win")
-            break
+
+    def swap_igrok_turn(self, igrok):
+        return 'X' if igrok == 'O' else 'O'
+
+    def show_pole(self):
+        for row in self.pole:
+            for item in row:
+                print(item, end=" ")
+            print()
+
+    def start(self):
+        self.create_pole()
+
+        igrok = 'X' if self.get_random_first_igrok() == 1 else 'O'
+        self.show_pole()
+        while True:
+            print(f"igrok {igrok} turn")
+
+            row, col = list(
+                map(int, input("Enter cells: ").split()))
+            print()
+            self.fix_spot(row - 1, col - 1, igrok)
+            self.show_pole()
+            if self.is_igrok_win(igrok):
+                print(f"Player { igrok } wins the game!")
+                break
+
+            if self.is_pole_filled():
+                print("Match Draw!")
+                break
+            igrok = self.swap_igrok_turn(igrok)
 
 
+        print()
+        # self.show_pole()
+
+
+tic_tac_toe = TicTacToe()
+tic_tac_toe.start()
