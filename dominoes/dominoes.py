@@ -58,8 +58,29 @@ def play_board():
     for i, piece in enumerate(board["player"]):
         print(f'{i + 1}:{piece}')
     print()
-        # print("Stock pieces:\n")
-        # print("pc bones\n")
-        # print("Player bones\n")
-        # print("Domino snake\n")
-        # print("STATUS:\n")
+
+
+def game_move(move):
+    try:
+       move = int(move)
+    except ValueError:
+        return False
+
+
+def make_move(move, player):
+    if move == 0:
+        stock_piece = choice(board['stock'])
+        board['stock'].remove(stock_piece)
+        board[player].append(stock_piece)
+        return
+    ind = (move) - 1
+    bones = board[player][ind]
+    board[player].remove(bones)
+    if move > 0:
+        board['snake'].append(bones)
+    else:
+        board['snake'].insert(0,bones)
+
+board = board()
+while
+
