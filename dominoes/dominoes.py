@@ -2,8 +2,12 @@ from itertools import combinations_with_replacement
 from random import sample, choice
 
 
+# sample () - это встроенная функция модуля random в Python, которая возвращает список элементов определенной длины, выбранных из последовательности, то есть списка, кортежа, строки или набора
+
+#основа поля для игры
 def board():
     domino = list(map(lambda x: list(x), combinations_with_replacement(range(7), 2)))
+# lambda- выражения в Python позволяют функции быть созданной и переданной(зачастую другой функции) в одной строчке кода.
     while True:
         player_bones = sample(domino, 7)
         pc_bones = sample(list(filter(lambda x: x not in player_bones, domino)), 7)
@@ -23,7 +27,7 @@ def board():
                     'stock': stock_bones, 'snake': [max_double],
                     'turn': first_player}
 
-
+#определение:победа,ничья,поражение
 def board_status():
     if len(board['player']) == 0:
         return 'The game is over. You win!'
@@ -35,7 +39,7 @@ def board_status():
             return "The game is over. It's a draw!"
     return 'game_not_done'
 
-
+#таблица
 def play_board():
     print('=' * 70)
     print('Stock size:', len(board['stock']))
@@ -57,7 +61,7 @@ def play_board():
         print(f'{i + 1}:{bones}')
     print()
 
-
+#справление ошибок
 def move_on_board(move):
     try:
         move = int(move)
@@ -66,11 +70,8 @@ def move_on_board(move):
 
     return len(board['player']) >= abs(move)
 
-
+#ход , после которго, забирается одна из 6 костяшек
 def make_move(move, player):
-    """
-    player: can either be "player" or "pc"
-    """
     if move == 0:
         stock_bones = choice(board['stock'])
         board['stock'].remove(stock_bones)
@@ -84,7 +85,7 @@ def make_move(move, player):
     else:
         board['snake'].insert(0, bones)
 
-
+#  игра
 board = board()
 while True:
     play_board()
