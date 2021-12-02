@@ -1,5 +1,5 @@
 from itertools import combinations_with_replacement
-from random import sample
+from random import sample, choice
 
 
 def board():
@@ -24,16 +24,16 @@ def board():
                     'turn': first_player}
 
 
- def board_status():
-     if len(board['player']) == 0:
-         return 'The game is over. You win!'
-     elif len(board['pc']) == 0:
-         return 'The game is over. The pc won!'
-     snake = [num for bones in board['snake'] for num in bones]
-     for i in range(7):
-         if i in board['snake'][0] and i in board['snake'][-1] and snake.count(i) == 8:
-             return "The game is over. It's a draw!"
-     return 'game_not_done'
+def board_status():
+    if len(board['player']) == 0:
+        return 'The game is over. You win!'
+    elif len(board['pc']) == 0:
+        return 'The game is over. The pc won!'
+    snake = [num for bones in board['snake'] for num in bones]
+    for i in range(7):
+        if i in board['snake'][0] and i in board['snake'][-1] and snake.count(i) == 8:
+            return "The game is over. It's a draw!"
+    return 'game_not_done'
 
 
 def play_board():
@@ -56,3 +56,57 @@ def play_board():
     for i, bones in enumerate(board['player']):
         print(f'{i + 1}:{bones}')
     print()
+
+
+def move_on_board(move):
+    try:
+        move = int(move)
+    except ValueError:
+        return False
+
+    return len(board['player']) >= abs(move)
+
+
+def make_move(move, player):
+    """
+    player: can either be "player" or "pc"
+    """
+    if move == 0:
+        stock_bones = choice(board['stock'])
+        board['stock'].remove(stock_bones)
+        board[player].append(stock_bones)
+        return
+    index = abs(move) - 1
+    bones = board[player][index]
+    board[player].remove(bones)
+    if move > 0:
+        board['snake'].append(bones)
+    else:
+        board['snake'].insert(0, bones)
+
+
+board = board()
+while True:
+    play_board()
+    game_state = board_status()
+
+    if game_state != 'game_not_done':
+        print('Status:', game_state)
+        break
+
+    turn = board['turn']
+    if turn == 'player':
+        print("Status: It's your turn to make a move. Enter your command:")
+        while True:
+            move = input()
+            if move_on_board(move):
+                break
+            print('Invalid input. Please try again.')
+        move = int(move)
+        board['turn'] = 'pc'
+    else:
+        input('Status: Pc is about to make a move. Please push Enter')
+        move = choice(range(-len(board['pc']), len(board['pc'])))
+        board['turn'] = 'player'
+
+    make_move(move, turn)
