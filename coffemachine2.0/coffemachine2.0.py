@@ -1,3 +1,12 @@
+print("How many cups you need ?:")
+cups = input()
+print('For ' + str(cups) + ' cups of coffee you will need:')
+water = cups * 200
+milk = cups * 50
+beans = cups * 15
+print(str(water) + ' ml of water')
+print(str(milk) + ' ml of milk')
+print(str(beans) + ' ml of coffee beans')
 print("""
 1-Starting to make a coffee
 2-Grinding coffee beans
