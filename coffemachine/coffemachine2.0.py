@@ -1,137 +1,119 @@
-# ингридиентов в кофеварке
-money = 550
-water = 400
-milk = 540
-beans = 120
-cups = 9
+class CoffeMachine:
+    # ингридиентов в кофеварке
+    def __init__(self):
+        self.money = 550
+        self.water = 400
+        self.milk = 540
+        self.beans = 120
+        self.cups = 9
 
-class CustomError(Exception):
-    pass
+    # CustomError(собственный) - пользовательское исключение
+    # Exception(встроенный) - заканчиваются полностью системные исключения  и начинаются обыкновенные, с которыми можно работать.
 
-# CustomError(собственный) - пользовательское исключение
-# Exception(встроенный) - заканчиваются полностью системные исключения  и начинаются обыкновенные, с которыми можно работать.
+    # кол-во каждого ингридиента в машине
+    def print_state(self):
+        print("The coffee machine has:")
+        print(self.water, "of water")
+        print(self.milk, "of milk")
+        print(self.beans, "of coffee beans")
+        print(self.cups, "of disposable cups")
+        print(f"$ {self.money} of money")
 
-# кол-во каждого ингридиента в машине
-def print_state():
-    print()
-    print('The coffee machine has:')
-    print(f'{water} of water')
-    print(f'{milk} of milk')
-    print(f'{beans} of coffee beans')
-    print(f'{cups} of disposable cups')
-    print(f'{money} of money')
-    print()
+    # выбор действия
+    def select_action(self):
+        done = False
+        while not done:
+            print("ATTENCION!!! Here you must write words no numbers!")
+            action = input('Write action:\n 1-buy\n 2-fill\n 3-take\n 4-remaining\n 5-exit\n:')
+            if action == "buy":
+                CoffeMachine.buy(self)
+            elif action == "fill":
+                CoffeMachine.fill(self)
+            elif action == "take":
+                CoffeMachine.take(self)
+            elif action == "remaining":
+                CoffeMachine.select_coffe(self)
+            elif action == "exit":
+                done = True
+            else:
+                print("invalid choice")
 
-# выбор действия
-def select_action() -> str:
-    print("ATTENCION!!! Here you must write words no numbers!")
-    return input('Write action:\n 1-buy\n 2-fill\n 3-take\n 4-remaining\n 5-exit\n:')
+    # выбор 1 из 3 вариантов кофе
+    def select_coffe(self):
+        print()
+        move = input('What do you want to buy?'
+                     ' 1 - espresso,'
+                     ' 2 - latte,'
+                     ' 3 - cappuccino,'
+                     ' 4 - back to main menu: ')
+        if move == '4':
+            return 0
+        return int(move)
 
-# выбор 1 из 3 вариантов кофе
-def select_coffe() -> int:
-    print()
-    move = input('What do you want to buy?'
-                 ' 1 - espresso,'
-                 ' 2 - latte,'
-                 ' 3 - cappuccino,'
-                 ' 4 - back to main menu: ')
-    if move == '4':
-        return 0
-    return int(move)
+    # проверка ,на ,достаточно ли ингр. в машине
+    def is_enough(self, needed_water, needed_milk, needed_coffee):
+        if self.water < needed_water:
+            print('Sorry, not enough water!')
+            return False
+        if self.milk < needed_milk:
+            print('Sorry, not enough milk!')
+            return False
+        if self.beans < needed_coffee:
+            print('Sorry, not enough beans!')
+            return False
+        if self.cups < 1:
+            print('Sorry, not enough cups\n')
+            return False
+        print('I have enough resources, making you a coffee!\n')
+        return True
 
-# проверка ,на ,достаточно ли ингр. в машине
-def is_enough(need_water=0, need_milk=0, need_beans=0):
-    if water < need_water:
-        print('Sorry, not enough water!\n')
-        raise CustomError
-    if milk < need_milk:
-        print('Sorry, not enough milk!\n')
-        raise CustomError
-    if beans < need_beans:
-        print('Sorry, not enough beans!\n')
-        raise CustomError
-    if cups < 1:
-        print('Sorry, not enough cups\n')
-        raise CustomError
-    print('I have enough resources, making you a coffee!\n')
+    # функция, для покупки кофе(1-ecпрессо,2-латте,3-капучино)
+    def buy(self):
+        drink = input("What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino, back - to main menu:")
+        if drink == "back":
 
-# raise - позволяет вызвать конкретное исключение.
-
-# функция, для покупки кофе
-def buy():
-    global money, water, milk, beans, cups
-
-    variants = select_coffe()
-
-    try:
-        if variants == 0:
-            pass
-        elif variants == 1:  # espresso
-            is_enough(need_water=250, need_beans=16)
-
-            money += 4
-            water -= 250
-            beans -= 16
-            cups -= 1
-        elif variants == 2:  # latte
-            is_enough(need_water=350, need_milk=75, need_beans=20)
-
-            money += 7
-            water -= 350
-            milk -= 75
-            beans -= 20
-            cups -= 1
-        elif variants == 3:  # cappuccino
-            is_enough(need_water=200, need_milk=100, need_beans=12)
-
-            money += 6
-            water -= 200
-            milk -= 100
-            beans -= 12
-            cups -= 1
+            return
+        elif drink == '1':
+            if CoffeMachine.is_enough(self, 250, 0, 16):
+                self.water -= 250
+                self.beans -= 16
+                self.money += 4
+                self.cups -= 1
+        elif drink == '2':
+            if CoffeMachine.is_enough(self, 350, 75, 20):
+                self.water -= 350
+                self.milk -= 75
+                self.beans -= 20
+                self.money += 7
+                self.cups -= 1
+        elif drink == '3':
+            if CoffeMachine.is_enough(self, 200, 100, 12):
+                self.water -= 200
+                self.milk -= 100
+                self.beans -= 12
+                self.money += 6
+                self.cups -= 1
         else:
-            raise ValueError(f'Unknown variant {variants}')
-    except CustomError:
-        pass
+            print('invalid choice')
+            return CoffeMachine.buy(self)
 
-# функция,для наполнения кофемашины
-def fill():
-    global water, milk, beans, cups
+    # функция,для наполнения кофемашины
+    def fill(self):
+        self.water += int(input('Write how many ml of water do you want to add: '))
+        self.milk += int(input('Write how many ml of milk do you want to add: '))
+        self.beans += int(input('Write how many grams of coffee beans'
+                                ' do you want to add: '))
+        self.cups += int(input('Write how many disposable cups of coffee'
+                               ' do you want to add: '))
 
-    print()
-    water += int(input('Write how many ml of water do you want to add: '))
-    milk += int(input('Write how many ml of milk do you want to add: '))
-    beans += int(input('Write how many grams of coffee beans'
-                       ' do you want to add: '))
-    cups += int(input('Write how many disposable cups of coffee'
-                      ' do you want to add: '))
-    print()
+    #  функция, для изьятия денег из машины
+    def take(self):
 
-#  функция, для изьятия денег из машины
-def take():
-    global money
+        print()
+        print(f'I gave you {self.money} griven')
+        self.money = 0
 
-    print()
-    print(f'I gave you {money} griven')
-    print()
 
-    money = 0
-
-def menu():
-    while True:
-        action = select_action()
-
-        if action == 'buy':
-            buy()
-        elif action == 'fill':
-            fill()
-        elif action == 'take':
-            take()
-        elif action == 'exit':
-            break
-        elif action == 'remaining':
-            print_state()
-        else:
-            raise ValueError(f'Unknown command {action}')
-
-menu()
+if __name__=="__main__":
+    coffe = CoffeMachine()
+    coffe.buy()
