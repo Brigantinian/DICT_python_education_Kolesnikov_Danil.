@@ -48,4 +48,5 @@ def main():
         guess(ready_word, guess_word)
 
 
-main()
+if __name__ == "__main__":
+    main()
