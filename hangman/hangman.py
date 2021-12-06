@@ -61,7 +61,7 @@ def main():
         guess(ready_word, guess_word)
 
 
-main()
+
 
 
 
