@@ -18,6 +18,7 @@ class TicTacToe:
     def fix_spot(self, row, col, igrok):
         self.pole[row][col] = igrok
 
+
     def is_igrok_win(self, igrok):
         win = False
         n = len(self.pole)
@@ -26,12 +27,9 @@ class TicTacToe:
             if (self.pole[row][0] == self.pole[row][1] == self.pole[row][2] == igrok):
                 win = True
         # Выигрыш по вертикали
-        if (self.pole[0][0] == self.pole[1][0] == self.pole[2][0] == igrok):
-            win = True
-        if (self.pole[0][1] == self.pole[1][1] == self.pole[2][1] == igrok):
-            win = True
-        if (self.pole[0][2] == self.pole[1][2] == self.pole[2][2] == igrok):
-            win = True
+        for col in range(3):
+            if (self.pole[0][col] == self.pole[1][col] == self.pole[2][col] == igrok):
+                win = True
         # Выигрыш по диагонали 1
         if (self.pole[0][0] == self.pole[1][1] == self.pole[2][2] == igrok):
             win = True
@@ -98,8 +96,6 @@ class TicTacToe:
 
         print()
 
-tic_tac_toe = TicTacToe()
-tic_tac_toe.start()
-
 if __name__ == "__main__":
-    print()
+    tic_tac_toe = TicTacToe()
+    tic_tac_toe.start()
