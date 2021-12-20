@@ -1,113 +1,136 @@
-from itertools import combinations_with_replacement
-from random import sample, choice
+import random
+
+stash = [
+    [0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6],
+    [1, 1], [1, 2], [1, 3], [1, 4], [1, 5], [1, 6],
+    [2, 2], [2, 3], [2, 4], [2, 5], [2, 6],
+    [3, 3], [3, 4], [3, 5], [3, 6],
+    [4, 4], [4, 5], [4, 6],
+    [5, 5], [5, 6],
+    [6, 6]
+]
+players = {}
+board = []
 
 
-# sample () - это встроенная функция модуля random в Python, которая возвращает список элементов определенной длины, выбранных из последовательности, то есть списка, кортежа, строки или набора
+def get_bones(player_name, count):
+    for i in range(0, count):
+        bone_idx = random.randint(0, len(stash) - 1)
+        players[player_name].append(stash[bone_idx])
+        del stash[bone_idx]
 
-#основа поля для игры
-def board():
-    domino = list(map(lambda x: list(x), combinations_with_replacement(range(7), 2)))
-# lambda- выражения в Python позволяют функции быть созданной и переданной(зачастую другой функции) в одной строчке кода.
-    while True:
-        player_bones = sample(domino, 7)
-        pc_bones = sample(list(filter(lambda x: x not in player_bones, domino)), 7)
-        stock_bones = list(filter(lambda x: x not in (player_bones + pc_bones), domino))
-        player_doubles = [bones for bones in player_bones if len(set(bones)) == 1]
-        pc_doubles = [bones for bones in pc_bones if len(set(bones)) == 1]
-        doubles = player_doubles + pc_doubles
-        if doubles:
-            max_double = max(doubles)
-            if max_double in player_doubles:
-                player_bones.remove(max_double)
-                first_player = "pc"
-            else:
-                pc_bones.remove(max_double)
-                first_player = "player"
-            return {'player': player_bones, 'pc': pc_bones,
-                    'stock': stock_bones, 'snake': [max_double],
-                    'turn': first_player}
 
-#определение:победа,ничья,поражение
-def board_status():
-    if len(board['player']) == 0:
-        return 'The game is over. You win!'
-    elif len(board['pc']) == 0:
-        return 'The game is over. The pc won!'
-    snake = [num for bones in board['snake'] for num in bones]
-    for i in range(7):
-        if i in board['snake'][0] and i in board['snake'][-1] and snake.count(i) == 8:
-            return "The game is over. It's a draw!"
-    return 'game_not_done'
+def lowest_double():
+    lowest_double_value = None
+    first_move_player = None
+    for player_name in players:
+        for bone in players[player_name]:
+            if bone[0] == bone[1] and (lowest_double_value is None or bone[0] < lowest_double_value):
+                lowest_double_value = bone[0]
+                first_move_player = player_name
+    if lowest_double_value is None:
+        first_move_player = random.choice(list(players))
+    return first_move_player
 
-#таблица
-def play_board():
-    print('=' * 70)
-    print('Stock size:', len(board['stock']))
-    print('Pc bones:', len(board['pc']))
-    print()
-    snake = board['snake']
-    if len(snake) > 6:
-        for i in range(3):
-            print(snake[i], end='')
-        print('...', end='')
-        for i in range(-3, 0):
-            print(snake[i], end='')
+
+def print_player_board(player_name):
+    print("Chose option:")
+    idx = 0
+    for bone in players[player_name]:
+        print(f"{idx}: {bone}")
+        idx += 1
+
+
+def player_move(player_name, idx):
+    bone = players[player_name][idx]
+    if len(board) == 0 or board[len(board) - 1][1] == bone[0]:
+        board.append(players[player_name][idx])
+        del players[player_name][idx]
+        return True
     else:
-        for p in snake:
-            print(p, end='')
-    print()
-    print('Your bones:')
-    for i, bones in enumerate(board['player']):
-        print(f'{i + 1}:{bones}')
-    print()
-
-#справление ошибок
-def move_on_board(move):
-    try:
-        move = int(move)
-    except ValueError:
         return False
 
-    return len(board['player']) >= abs(move)
 
-#ход , после которго, забирается одна из 6 костяшек
-def make_move(move, player):
-    if move == 0:
-        stock_bones = choice(board['stock'])
-        board['stock'].remove(stock_bones)
-        board[player].append(stock_bones)
-        return
-    index = abs(move) - 1
-    bones = board[player][index]
-    board[player].remove(bones)
-    if move > 0:
-        board['snake'].append(bones)
+def computer_move(can_stash):
+    should_go_to_stash = True
+    moved = False
+    for bone_idx, _ in enumerate(players['computer']):
+        if not moved:
+            move_result = player_move('computer', bone_idx)
+            if move_result:
+                moved = True
+                should_go_to_stash = False
+    if should_go_to_stash and can_stash:
+        get_bones('computer', 1)
+        # "len(players['computer'] - 1" ==> after stash last item drops in the end of list
+        move_after_stash_result = player_move('computer', len(players['computer']) - 1)
+        if not move_after_stash_result:
+            print('Computer passed')
+    elif should_go_to_stash and not can_stash:
+        print('Computer passed')
     else:
-        board['snake'].insert(0, bones)
+        print("Computer made a move")
 
-#  игра
-board = board()
-while True:
-    play_board()
-    game_state = board_status()
 
-    if game_state != 'game_not_done':
-        print('Status:', game_state)
-        break
+def game():
+    # Create computer player
+    players['computer'] = []
+    # Create human player
+    player_name_choice = input('Enter player name: ')
+    players[player_name_choice] = []
+    # Give bones
+    for player_name in list(players):
+        get_bones(player_name, 7)
+    # Have player already been in stash
+    was_in_stash = False
+    # Computer moves first
+    move_turn = lowest_double()
+    # Game stated
+    while True:
+        try:
+            # Can player go to stash
+            can_go_to_stash = True if len(stash) > 0 else False
+            if move_turn == 'computer':
+                computer_move(can_go_to_stash)
+                move_turn = player_name_choice
+                print(board)
+            else:
+                # Print board
+                print_player_board(player_name_choice)
+                if can_go_to_stash and not was_in_stash:
+                    print("- stash")
+                else:
+                    print("- pass")
+                # Player move
+                player_move_choice = input("Chose on of the options upset: ")
 
-    turn = board['turn']
-    if turn == 'player':
-        print("Status: It's your turn to make a move. Enter your command:")
-        while True:
-            move = input()
-            if move_on_board(move):
+                if player_move_choice == "stash" and can_go_to_stash and not was_in_stash:
+                    get_bones(player_name_choice, 1)
+                    was_in_stash = True
+                elif player_move_choice == "pass" and (not can_go_to_stash or was_in_stash):
+                    print("Passed")
+                    move_turn = 'computer'
+                    was_in_stash = False
+                elif int(player_move_choice) < len(players[player_name_choice]):
+                    player_move_result = player_move(player_name_choice, int(player_move_choice))
+                    if player_move_result:
+                        move_turn = 'computer'
+                        was_in_stash = False
+                    else:
+                        print("You can't move this bone")
+                else:
+                    print("Incorrect input. Try one's more")
+                # Show board
+                print(board)
+
+            if len(stash) == 0:
+                print("No more bones in stash")
+                print("Game ended")
                 break
-            print('Invalid input. Please try again.')
-        move = int(move)
-        board['turn'] = 'pc'
-    else:
-        input('Status: Pc is about to make a move. Please push Enter')
-        move = choice(range(-len(board['pc']), len(board['pc'])))
-        board['turn'] = 'player'
+            print(players)
+        except:
+            print("Incorrect input. Try one's more")
 
-    make_move(move, turn)
+
+if __name__ == "__main__":
+ game()
