@@ -1,0 +1,6 @@
+print("Please, enter the number of mycoins you have:")
+a = int(input())
+print("Please, enter the exchange rate:")
+b = float(input())
+c = float(a * b)
+print("The total amount of dollars:" + str(c))
