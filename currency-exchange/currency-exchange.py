@@ -1,49 +1,58 @@
 import requests
 import json
 
-turn = input("MOney :  yes"
-             "      or           no "
-             "\nYour answer:")
-while True:
-    if turn == "yes":
-        b = input("How much money do you want to put into the account?\n")
-        c = input("OK ,on your account :" + b)
-        q = input("Currency what you have:")
-        n = input("Currency what you want:")
-        print(q + " in  " + n)
 
-        url = "http://www.floatrates.com/daily/" + n + ".json"
-        url2 = "http://www.floatrates.com/daily/" + q + ".json"
-        r = requests.get(url)
-        r1 = requests.get(url2)
-        data = json.loads(r.text)
-        data1 = json.loads(r1.text)
-        exchange_rates2 = data[q]['inverseRate']
-        print("In your cache")
-        print(n)
-        dengi = input((exchange_rates2) * int(b))
-        while True:
+def req(this):
+    url = "http://www.floatrates.com/daily/" + str(this['currency_type_for_inverse']) + ".json"
+    r = requests.get(url)
+    data = json.loads(r.text)
+    this['exchange_rates'] = data[this['my_currency_type']]['inverseRate']
+    return this
+
+
+if __name__ == '__main__':
+    money = {
+        'my_money': int(input("How much money do you want to put into the account?\n")),
+        'my_currency_type': input("Currency type what you have:"),
+        'currency_type_for_inverse': None,
+        'exchange_rates': 0
+    }
+    all_money = {
+        money['my_currency_type']: money['my_money']
+    }
+
+    while True:
+        if money['my_money'] == 0:
+            print('Sorry, You haven`t money on your account!')
+            break
+        value_money = int(input("Print how much money you what to inverse:"))
+        if money['my_money'] - value_money < 0:
+            print('Sorry, You can`t inverse this value of money!')
+            continue
+        type_money = input("Print type of currency what you want:")
+        if type_money == money['currency_type_for_inverse']:
+            new_money = money['exchange_rates'] * value_money
+            money['my_money'] -= value_money
+            money[type_money] += new_money
+            all_money[money['my_currency_type']] -= value_money
+            all_money[type_money] += new_money
+        else:
+            money['currency_type_for_inverse'] = type_money
+            money = req(money)
+            new_money = money['exchange_rates'] * value_money
             try:
-                turn1 = input("You wonna to continue: yes or no?")
-                if turn1 == "yes":
-                    print("On your account?\n" + str((exchange_rates2) * int(dengi)))
-                    q = input("Currency what you have:"+n)
-                    n1 = input("Currency what you want:")
-                    print(n + " in  " + n1)
-                    url = "http://www.floatrates.com/daily/" + n1 + ".json"
-                    url2 = "http://www.floatrates.com/daily/" + n + ".json"
-                    r = requests.get(url)
-                    r1 = requests.get(url2)
-                    data = json.loads(r.text)
-                    data1 = json.loads(r1.text)
-                    exchange_rates2 = data[n]['inverseRate']
-                    print("In your cache")
-                    print(n1)
-                    print((exchange_rates2) * int(b))
-                if turn1 == "no":
-                    print("Bye!")
-                    break
-            except:
-                print("Sorry , not enough money ! Bye!")
-                break
-    break
+                money[type_money] += new_money
+                all_money[type_money] += new_money
+            except KeyError:
+                money[type_money] = new_money
+                all_money[type_money] = new_money
+            money['my_money'] -= value_money
+            all_money[money['my_currency_type']] -= value_money
+        print('\nAfter inverse you have:')
+        print(all_money)
+        print('')
+        turn = input('You should to continue? (y/n)\n')
+        if turn.lower() == 'n' or turn.lower() == 'no':
+            break
+    print('The final result of the inverse:')
+    print(all_money)
